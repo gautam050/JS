@@ -3,8 +3,8 @@
 <head>
   <title>Idea Feed</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    #ideaList div { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+    body { font-family: sans-serif; padding: 20px;  background-color: aquamarine;}
+    #ideaList div { border: 1px solid black; padding: 10px; margin: 10px 0; }
   </style>
 </head>
 <body>
@@ -20,6 +20,7 @@
   <input type="text" id="searchInput" placeholder="Search ideas..." onkeyup="filterIdeas()">
   <select id="sortSelect" onchange="renderIdeas()">
     <option value="recent">Most Recent</option>
+    <option value="Most Popular">Most Popular</option>
   </select>
 
   <div id="ideaList"></div>
