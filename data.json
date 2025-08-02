@@ -1,0 +1,12 @@
+{
+  "ideas": {
+    "idea1": {
+      "title": "Add Dark Mode",
+      "description": "Let users toggle between dark and light themes."
+    },
+    "idea2": {
+      "title": "Add Tags to Ideas",
+      "description": "Allow tagging ideas for better filtering."
+    }
+  }
+}

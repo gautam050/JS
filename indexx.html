@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Idea Feed</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #ideaList div { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <h1>🔥 Idea Feed</h1>
+
+  <div style="margin-top: 20px;">
+    <input type="text" id="ideaTitle" placeholder="Title"><br>
+    <textarea id="ideaDesc" placeholder="Description"></textarea><br>
+    <button onclick="submitIdea()">Submit Idea</button>
+  </div>
+
+  <hr>
+  <input type="text" id="searchInput" placeholder="Search ideas..." onkeyup="filterIdeas()">
+  <select id="sortSelect" onchange="renderIdeas()">
+    <option value="recent">Most Recent</option>
+  </select>
+
+  <div id="ideaList"></div>
+  <button id="loadMoreBtn" onclick="loadMore()">Load More</button>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7tu3Yesd6ZnOMvxbe1obWIHMmbCa2Tf0",
+      authDomain: "idea-feed.firebaseapp.com",
+      databaseURL: "https://idea-feed-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "idea-feed",
+      storageBucket: "idea-feed.firebasestorage.app",
+      messagingSenderId: "951496306752",
+      appId: "1:951496306752:web:cf81a78e169b4c198befa5",
+      measurementId: "G-VDXM4HHX1Q"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let allIdeas = [];
+    let visibleIdeas = [];
+    let visibleCount = 5;
+
+    function submitIdea() {
+      const title = document.getElementById("ideaTitle").value;
+      const description = document.getElementById("ideaDesc").value;
+
+      if (!title || !description) return;
+
+      const newIdea = {
+        title,
+        description,
+        createdAt: Date.now()
+      };
+
+      db.ref("ideas").push(newIdea);
+    }
+
+    function renderIdeas() {
+      const list = document.getElementById("ideaList");
+      const searchText = document.getElementById("searchInput").value.toLowerCase();
+      const sortType = document.getElementById("sortSelect").value;
+
+      let filtered = allIdeas.filter(idea =>
+        idea.title.toLowerCase().includes(searchText) ||
+        idea.description.toLowerCase().includes(searchText)
+      );
+
+      if (sortType === "recent") {
+        filtered.sort((a, b) => b.createdAt - a.createdAt);
+      }
+
+      visibleIdeas = filtered.slice(0, visibleCount);
+      list.innerHTML = "";
+
+      visibleIdeas.forEach(idea => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <h3>${idea.title}</h3>
+          <p>${idea.description}</p>
+        `;
+        list.appendChild(div);
+      });
+
+      document.getElementById("loadMoreBtn").style.display =
+        visibleCount >= filtered.length ? "none" : "inline";
+    }
+
+    function filterIdeas() {
+      visibleCount = 5;
+      renderIdeas();
+    }
+
+    function loadMore() {
+      visibleCount += 5;
+      renderIdeas();
+    }
+
+    function listenToIdeas() {
+      db.ref("ideas").on("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        const entries = Object.entries(data).map(([id, idea]) => ({ id, ...idea }));
+        allIdeas = entries;
+        visibleCount = 5;
+        renderIdeas();
+      });
+    }
+
+    listenToIdeas();
+  </script>
+</body>
+</html>
